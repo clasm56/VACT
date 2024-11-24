@@ -1,0 +1,31 @@
+{
+    "id": "EDB0E124",
+    "path": "~/VACT/VACT.qmd",
+    "project_path": "VACT.qmd",
+    "type": "quarto_markdown",
+    "hash": "2957907452",
+    "contents": "",
+    "dirty": false,
+    "created": 1732478713674.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "rmdVisualMode": "false",
+        "rmdVisualWrapConfigured": "true",
+        "source_window_id": "",
+        "Source": "Source",
+        "docOutlineVisible": "1",
+        "cursorPosition": "0,0",
+        "scrollLine": "0",
+        "rmdVisualModeLocation": "1083:1142",
+        "rmdVisualCollapsedChunks": ""
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1732478998,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1732478998686,
+    "read_only": false,
+    "read_only_alternatives": []
+}
