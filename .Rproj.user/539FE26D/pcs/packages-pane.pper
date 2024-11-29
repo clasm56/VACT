@@ -1,0 +1,7 @@
+{
+    "installOptions": {
+        "installFromRepository": true,
+        "libraryPath": "/Users/chrissmith/Library/R/x86_64/4.4/library",
+        "installDependencies": true
+    }
+}

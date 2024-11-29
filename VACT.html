@@ -8,7 +8,7 @@
 <link href="VACT_files/libs/quarto-html/light-border.css" rel="stylesheet">
 <link href="VACT_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
 <link href="VACT_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.5.57">
+  <meta name="generator" content="quarto-1.4.555">
 
   <title>VACT</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -340,24 +340,26 @@
 <section id="course-content" class="slide level2">
 <h2>Course Content</h2>
 <ul>
-<li><p>Types of data collected in Clinical Trials</p></li>
+<li><p>Sources of data in Clinical Trials</p></li>
 <li><p>Various Techniques for Visualizing types of Data</p></li>
 <li><p>Interactive data exploration examples</p></li>
 </ul>
 </section>
-<section id="clinical-trial-data-chris" class="slide level2">
-<h2>Clinical Trial Data (CHris)</h2>
-<p>-Data flow/utility in clinical trials(premarket activites)</p>
+<section id="clinical-trial-data" class="slide level2">
+<h2>Clinical Trial Data</h2>
+<p>-Data flow/sources of data in clinical trials</p>
 </section>
-<section id="types-of-data" class="slide level2">
-<h2>Types of Data</h2>
-<p>-Categorical</p>
-<p>-Continuous</p>
+<section id="data-analysis-in-clinical-trials" class="slide level2">
+<h2>Data Analysis in Clinical Trials</h2>
+<ul>
+<li>AE Categorical</li>
+</ul>
+<p>-Labs Continuous</p>
 </section>
-<section id="patient-counts-for-aes" class="slide level2 smaller scrollable" data-transition="slide">
-<h2>Patient Counts for AE’s</h2>
+<section id="ae-magnitudes" class="slide level2 smaller scrollable" data-transition="slide">
+<h2>AE magnitudes</h2>
 <div class="panel-tabset">
-<ul id="tabset-1" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-1-1">BarChart</a></li><li><a href="#tabset-1-2">Barchart(Vertical)</a></li></ul>
+<ul id="tabset-1" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-1-1">BarChart(Vertical)</a></li><li><a href="#tabset-1-2">Barchart(Horizontal)</a></li><li><a href="#tabset-1-3">Grouped Barchart</a></li></ul>
 <div class="tab-content">
 <div id="tabset-1-1">
 <div class="cell">
@@ -381,20 +383,128 @@
 </div>
 </div>
 </div>
+<div id="tabset-1-3">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure>
+<p><img data-src="VACT_files/figure-revealjs/unnamed-chunk-3-1.png" width="960"></p>
+</figure>
 </div>
 </div>
-<div class="footer">
-<p>Learn more: <a href="https://quarto.org/docs/presentations/revealjs/#tabsets">Tabsets</a></p>
 </div>
+</div>
+</div>
+</div>
+<p>:::</p>
 </section>
 <section id="who-is-in-my-study-subdivisions" class="slide level2">
 <h2>Who is in my study (subdivisions)</h2>
+<div class="layout-sidebar layout-sidebar-left">
+<div class="cell panel-sidebar">
+<div class="cell-output-display">
+<div class="form-group shiny-input-container">
+<label class="control-label" id="mmse_range-label" for="mmse_range">Select MMSE Range:</label>
+<input class="js-range-slider" id="mmse_range" data-skin="shiny" data-type="double" data-min="10" data-max="24" data-from="10" data-to="24" data-step="1" data-grid="true" data-grid-num="7" data-grid-snap="false" data-prettify-separator="," data-prettify-enabled="true" data-keyboard="true" data-drag-interval="true" data-data-type="number">
+</div>
+</div>
+<div class="cell-output-display">
+<div id="stack_var" class="form-group shiny-input-radiogroup shiny-input-container" role="radiogroup" aria-labelledby="stack_var-label">
+<label class="control-label" id="stack_var-label" for="stack_var">Stack By:</label>
+<div class="shiny-options-group">
+<div class="radio">
+<label>
+<input type="radio" name="stack_var" value="none" checked="checked">
+<span>None (Race Totals)</span>
+</label>
+</div>
+<div class="radio">
+<label>
+<input type="radio" name="stack_var" value="TRT01A">
+<span>Dose (TRT01A)</span>
+</label>
+</div>
+<div class="radio">
+<label>
+<input type="radio" name="stack_var" value="AGEGR1">
+<span>Age Group (AGEGR1)</span>
+</label>
+</div>
+<div class="radio">
+<label>
+<input type="radio" name="stack_var" value="BMIBLGR1">
+<span>BMI Group (BMIBLGR1)</span>
+</label>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell panel-fill">
+<div class="cell-output-display">
+<div class="shiny-plot-output html-fill-item" id="race_plot" style="width:100%;height:400px;"></div>
+</div>
+</div>
+</div>
 </section>
-<section id="changes-over-time" class="slide level2">
-<h2>Changes over time</h2>
+<section id="what-is-happening-across-study-visitscumulative-exposure" class="slide level2">
+<h2>What is happening across Study Visits(Cumulative Exposure)</h2>
+<div class="layout-sidebar layout-sidebar-left">
+<div class="cell panel-sidebar">
+<div class="cell-output-display no-overflow-x">
+<div class="form-group shiny-input-container">
+<label class="control-label" id="param-label" for="param">Select Lab Variable (PARAM):</label>
+<div>
+<select id="param" class="shiny-input-select"><option value="Sodium (mmol/L)" selected="">Sodium (mmol/L)</option>
+<option value="Potassium (mmol/L)">Potassium (mmol/L)</option>
+<option value="Chloride (mmol/L)">Chloride (mmol/L)</option>
+<option value="Bilirubin (umol/L)">Bilirubin (umol/L)</option>
+<option value="Alkaline Phosphatase (U/L)">Alkaline Phosphatase (U/L)</option>
+<option value="Gamma Glutamyl Transferase (U/L)">Gamma Glutamyl Transferase (U/L)</option>
+<option value="Alanine Aminotransferase (U/L)">Alanine Aminotransferase (U/L)</option>
+<option value="Aspartate Aminotransferase (U/L)">Aspartate Aminotransferase (U/L)</option>
+<option value="Blood Urea Nitrogen (mmol/L)">Blood Urea Nitrogen (mmol/L)</option>
+<option value="Creatinine (umol/L)">Creatinine (umol/L)</option>
+<option value="Urate (umol/L)">Urate (umol/L)</option>
+<option value="Phosphate (mmol/L)">Phosphate (mmol/L)</option>
+<option value="Calcium (mmol/L)">Calcium (mmol/L)</option>
+<option value="Glucose (mmol/L)">Glucose (mmol/L)</option>
+<option value="Protein (g/L)">Protein (g/L)</option>
+<option value="Albumin (g/L)">Albumin (g/L)</option>
+<option value="Cholesterol (mmol/L)">Cholesterol (mmol/L)</option>
+<option value="Creatine Kinase (U/L)">Creatine Kinase (U/L)</option>
+<option value="Sodium (mmol/L) change from previous visit, relative to normal range">Sodium (mmol/L) change from previous visit, relative to normal range</option>
+<option value="Potassium (mmol/L) change from previous visit, relative to normal range">Potassium (mmol/L) change from previous visit, relative to normal range</option>
+<option value="Chloride (mmol/L) change from previous visit, relative to normal range">Chloride (mmol/L) change from previous visit, relative to normal range</option>
+<option value="Bilirubin (umol/L) change from previous visit, relative to normal range">Bilirubin (umol/L) change from previous visit, relative to normal range</option>
+<option value="Alkaline Phosphatase (U/L) change from previous visit, relative to normal range">Alkaline Phosphatase (U/L) change from previous visit, relative to normal range</option>
+<option value="Gamma Glutamyl Transferase (U/L) change from previous visit, relative to normal range">Gamma Glutamyl Transferase (U/L) change from previous visit, relative to normal range</option>
+<option value="Alanine Aminotransferase (U/L) change from previous visit, relative to normal range">Alanine Aminotransferase (U/L) change from previous visit, relative to normal range</option>
+<option value="Aspartate Aminotransferase (U/L) change from previous visit, relative to normal range">Aspartate Aminotransferase (U/L) change from previous visit, relative to normal range</option>
+<option value="Blood Urea Nitrogen (mmol/L) change from previous visit, relative to normal range">Blood Urea Nitrogen (mmol/L) change from previous visit, relative to normal range</option>
+<option value="Creatinine (umol/L) change from previous visit, relative to normal range">Creatinine (umol/L) change from previous visit, relative to normal range</option>
+<option value="Urate (umol/L) change from previous visit, relative to normal range">Urate (umol/L) change from previous visit, relative to normal range</option>
+<option value="Phosphate (mmol/L) change from previous visit, relative to normal range">Phosphate (mmol/L) change from previous visit, relative to normal range</option>
+<option value="Calcium (mmol/L) change from previous visit, relative to normal range">Calcium (mmol/L) change from previous visit, relative to normal range</option>
+<option value="Glucose (mmol/L) change from previous visit, relative to normal range">Glucose (mmol/L) change from previous visit, relative to normal range</option>
+<option value="Protein (g/L) change from previous visit, relative to normal range">Protein (g/L) change from previous visit, relative to normal range</option>
+<option value="Albumin (g/L) change from previous visit, relative to normal range">Albumin (g/L) change from previous visit, relative to normal range</option>
+<option value="Cholesterol (mmol/L) change from previous visit, relative to normal range">Cholesterol (mmol/L) change from previous visit, relative to normal range</option>
+<option value="Creatine Kinase (U/L) change from previous visit, relative to normal range">Creatine Kinase (U/L) change from previous visit, relative to normal range</option></select>
+<script type="application/json" data-for="param" data-nonempty="">{"plugins":["selectize-plugin-a11y"]}</script>
+</div>
+</div>
+</div>
+</div>
+<div class="cell panel-fill">
+<div class="cell-output-display">
+<div class="shiny-plot-output html-fill-item" id="linePlot" style="width:100%;height:400px;"></div>
+</div>
+</div>
+</div>
 </section>
-<section id="correlations-mixed-variable" class="slide level2">
-<h2>Correlations (Mixed variable)</h2>
+<section id="relationships-of-variables-mixed-variable" class="slide level2">
+<h2>Relationships of variables (Mixed variable)</h2>
 </section>
 <section id="ae" class="slide level2">
 <h2>AE</h2>
@@ -522,6 +632,95 @@
 </div>
 <p>
 <script type="application/shiny-prerendered" data-context="server-start">
+library(shiny)
+library(dplyr)
+library(haven)
+library(ggplot2)
+
+# Load dataset
+adsl <- read_xpt("data/adsl.xpt")
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+ filtered_data <- reactive({
+   adsl <- read_xpt("data/adsl.xpt") %>%
+      filter(MMSETOT >= input$mmse_range[1], MMSETOT <= input$mmse_range[2])
+  })
+
+output$race_plot <- renderPlot({
+    plot_data <- filtered_data()
+    
+    if (input$stack_var == "none") {
+      # Group by Race only for totals
+      plot_data <- plot_data %>%
+        group_by(RACE) %>%
+        summarize(Count = n(), .groups = "drop")
+      
+      ggplot(plot_data, aes(x = RACE, y = Count)) +
+        geom_bar(stat = "identity", fill = "steelblue") +
+        labs(
+          title = "Counts of Subjects by Race",
+          x = "Race",
+          y = "Count"
+        ) +
+        theme_minimal() +
+        theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    } else {
+      # Group by Race and the selected variable for stacking
+      plot_data <- plot_data %>%
+        group_by(RACE, .data[[input$stack_var]]) %>%
+        summarize(Count = n(), .groups = "drop")
+      
+      ggplot(plot_data, aes(x = RACE, y = Count, fill = .data[[input$stack_var]])) +
+        geom_bar(stat = "identity", position = "stack") +
+        labs(
+          title = paste("Counts of Subjects by Race (Stacked by", input$stack_var, ")"),
+          x = "Race",
+          y = "Count",
+          fill = input$stack_var
+        ) +
+        theme_minimal() +
+        theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    }
+  })
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server-start">
+library(shiny)
+library(ggplot2)
+library(dplyr)
+library(haven)
+
+# Read the lab data
+adlbc <- read_xpt("data/adlbc.xpt")
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server">
+  output$linePlot <- renderPlot({
+    # Filter data based on selected PARAM
+    filtered_data <- adlbc %>% filter(PARAM == input$param)
+    
+    # Summarize data to calculate mean AVAL for each VISIT
+    summarized_data <- filtered_data %>%
+      group_by(VISIT) %>%
+      summarise(mean_AVAL = mean(AVAL, na.rm = TRUE)) %>%
+      arrange(VISIT)
+    
+    # Create the line plot
+    ggplot(summarized_data, aes(x = VISIT, y = mean_AVAL)) +
+      geom_line(group = 1, color = "blue") +
+      geom_point(color = "blue") +
+      theme_minimal() +
+      labs(
+        title = paste("Mean AVAL for", input$param),
+        x = "Visit",
+        y = "Mean AVAL"
+      ) +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  })
+</script>
+ 
+<script type="application/shiny-prerendered" data-context="server-start">
 # Load necessary libraries
 library(shiny)
 library(random.cdisc.data)
@@ -608,7 +807,7 @@ ojs_define <- function(..., .session = shiny::getDefaultReactiveDomain()) {
 </p>
 <!--html_preserve-->
 <script type="application/shiny-prerendered" data-context="dependencies">
-{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["selectize"]},{"type":"character","attributes":{},"value":["0.15.2"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["www/shared/selectize"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["js/selectize.min.js","accessibility/js/selectize-plugin-a11y.min.js"]},{"type":"character","attributes":{},"value":["css/selectize.bootstrap3.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["shiny"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["1.9.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["selectize"]},{"type":"character","attributes":{},"value":["0.15.2"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["www/shared/selectize"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["js/selectize.min.js","accessibility/js/selectize-plugin-a11y.min.js"]},{"type":"character","attributes":{},"value":["css/selectize.bootstrap3.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["shiny"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["1.9.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["htmltools-fill"]},{"type":"character","attributes":{},"value":["0.5.8.1"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["fill"]}]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["fill.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["htmltools"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.5.8.1"]}]}]}
+{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["ionrangeslider-javascript"]},{"type":"character","attributes":{},"value":["2.3.1"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["www/shared/ionrangeslider"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["js/ion.rangeSlider.min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["shiny"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["1.9.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["strftime"]},{"type":"character","attributes":{},"value":["0.9.2"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["www/shared/strftime"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["strftime-min.js"]},{"type":"NULL"},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["shiny"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["1.9.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["ionrangeslider-css"]},{"type":"character","attributes":{},"value":["2.3.1"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["www/shared/ionrangeslider"]}]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["css/ion.rangeSlider.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["shiny"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["1.9.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["htmltools-fill"]},{"type":"character","attributes":{},"value":["0.5.8.1"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["fill"]}]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["fill.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["htmltools"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.5.8.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["selectize"]},{"type":"character","attributes":{},"value":["0.15.2"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["www/shared/selectize"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["js/selectize.min.js","accessibility/js/selectize-plugin-a11y.min.js"]},{"type":"character","attributes":{},"value":["css/selectize.bootstrap3.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["shiny"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["1.9.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["htmltools-fill"]},{"type":"character","attributes":{},"value":["0.5.8.1"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["fill"]}]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["fill.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["htmltools"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.5.8.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["selectize"]},{"type":"character","attributes":{},"value":["0.15.2"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["www/shared/selectize"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["js/selectize.min.js","accessibility/js/selectize-plugin-a11y.min.js"]},{"type":"character","attributes":{},"value":["css/selectize.bootstrap3.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["shiny"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["1.9.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["selectize"]},{"type":"character","attributes":{},"value":["0.15.2"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["www/shared/selectize"]}]},{"type":"NULL"},{"type":"character","attributes":{},"value":["js/selectize.min.js","accessibility/js/selectize-plugin-a11y.min.js"]},{"type":"character","attributes":{},"value":["css/selectize.bootstrap3.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["shiny"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["1.9.1"]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","version","src","meta","script","stylesheet","head","attachment","package","all_files","pkgVersion"]},"class":{"type":"character","attributes":{},"value":["html_dependency"]}},"value":[{"type":"character","attributes":{},"value":["htmltools-fill"]},{"type":"character","attributes":{},"value":["0.5.8.1"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["file"]}},"value":[{"type":"character","attributes":{},"value":["fill"]}]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["fill.css"]},{"type":"NULL"},{"type":"NULL"},{"type":"character","attributes":{},"value":["htmltools"]},{"type":"logical","attributes":{},"value":[true]},{"type":"character","attributes":{},"value":["0.5.8.1"]}]}]}
 </script>
 <!--/html_preserve-->
 <!--html_preserve-->
@@ -902,7 +1101,18 @@ ojs_define <- function(..., .session = shiny::getDefaultReactiveDomain()) {
         }
         return false;
       }
-      const onCopySuccess = function(e) {
+      const clipboard = new window.ClipboardJS('.code-copy-button', {
+        text: function(trigger) {
+          const codeEl = trigger.previousElementSibling.cloneNode(true);
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+      });
+      clipboard.on('success', function(e) {
         // button target
         const button = e.trigger;
         // don't keep focus
@@ -934,29 +1144,7 @@ ojs_define <- function(..., .session = shiny::getDefaultReactiveDomain()) {
         }, 1000);
         // clear code selection
         e.clearSelection();
-      }
-      const getTextToCopy = function(trigger) {
-          const codeEl = trigger.previousElementSibling.cloneNode(true);
-          for (const childEl of codeEl.children) {
-            if (isCodeAnnotation(childEl)) {
-              childEl.remove();
-            }
-          }
-          return codeEl.innerText;
-      }
-      const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
-        text: getTextToCopy
       });
-      clipboard.on('success', onCopySuccess);
-      if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-        // For code content inside modals, clipBoardJS needs to be initialized with a container option
-        // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
-        const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
-          text: getTextToCopy,
-          container: window.document.getElementById('quarto-embedded-source-code-modal')
-        });
-        clipboardModal.on('success', onCopySuccess);
-      }
         var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
         var mailtoRegex = new RegExp(/^mailto:/);
           var filterRegex = new RegExp('/' + window.location.host + '/');
@@ -964,7 +1152,7 @@ ojs_define <- function(..., .session = shiny::getDefaultReactiveDomain()) {
             return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
         }
         // Inspect non-navigation links and adorn them if external
-     	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+     	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
         for (var i=0; i<links.length; i++) {
           const link = links[i];
           if (!isInternal(link.href)) {
