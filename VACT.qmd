@@ -20,13 +20,13 @@ An interactive review of how visual analytics is used for data exploration in pr
 
 -   Interactive data exploration examples
 
-## Clinical Trial Data 
+## Clinical Trial Data
 
 -Data flow/sources of data in clinical trials
 
 ## Data Analysis in Clinical Trials
 
-- AE Categorical
+-   AE Categorical
 
 -Labs Continuous
 
@@ -65,7 +65,9 @@ ggplot(adae_top15, aes(x = fct_infreq(AEDECOD))) +
 
 
 ```
+
 ### Barchart(Horizontal)
+
 ```{r}
 #| echo: false
 library(haven)
@@ -85,6 +87,7 @@ ggplot(adae, aes(x = AESEV)) +
 ```
 
 ### Grouped Barchart
+
 ```{r}
 library(haven)
 library(ggplot2)
@@ -114,9 +117,11 @@ ggplot(adae_top15, aes(x = fct_infreq(AEDECOD), fill = AESEV)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Tilt x-axis labels for readability
 ```
 :::
+
 :::
 
-## Who is in my study (subdivisions) 
+## Who is in my study (subdivisions)
+
 ```{r}
 #| context: setup 
 library(shiny)
@@ -202,6 +207,7 @@ output$race_plot <- renderPlot({
 ```
 
 ## What is happening across Study Visits(Cumulative Exposure)
+
 ```{r}
 #| context: setup 
 library(shiny)
