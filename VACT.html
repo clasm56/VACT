@@ -8,7 +8,7 @@
 <link href="VACT_files/libs/quarto-html/light-border.css" rel="stylesheet">
 <link href="VACT_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
 <link href="VACT_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.5.57">
+  <meta name="generator" content="quarto-1.3.433">
 
   <title>VACT</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -155,8 +155,7 @@
   }
 
   .callout.callout-titled .callout-body > .callout-content > :last-child {
-    padding-bottom: 0.5rem;
-    margin-bottom: 0;
+    margin-bottom: 0.5rem;
   }
 
   .callout.callout-titled .callout-icon::before {
@@ -364,33 +363,21 @@
 <div id="tabset-1-1">
 <div class="cell">
 <div class="cell-output-display">
-<div>
-<figure>
 <p><img data-src="VACT_files/figure-revealjs/unnamed-chunk-1-1.png" width="960"></p>
-</figure>
-</div>
 </div>
 </div>
 </div>
 <div id="tabset-1-2">
 <div class="cell">
 <div class="cell-output-display">
-<div>
-<figure>
 <p><img data-src="VACT_files/figure-revealjs/unnamed-chunk-2-1.png" width="960"></p>
-</figure>
-</div>
 </div>
 </div>
 </div>
 <div id="tabset-1-3">
 <div class="cell">
 <div class="cell-output-display">
-<div>
-<figure>
 <p><img data-src="VACT_files/figure-revealjs/unnamed-chunk-3-1.png" width="960"></p>
-</figure>
-</div>
 </div>
 </div>
 </div>
@@ -656,33 +643,62 @@ output$race_plot <- renderPlot({
         group_by(RACE) %>%
         summarize(Count = n(), .groups = "drop")
       
-      ggplot(plot_data, aes(x = RACE, y = Count)) +
-        geom_bar(stat = "identity", fill = "steelblue") +
+      ggplot(plot_data, aes(x = reorder(RACE, -Count), y = Count)) +
+        geom_bar(stat = "identity", fill = "steelblue", color = "black", width = 0.7) +
+        geom_text(aes(label = Count), vjust = -0.5, size = 4, fontface = "bold") +
         labs(
           title = "Counts of Subjects by Race",
+          subtitle = "Total subject counts grouped by race",
           x = "Race",
           y = "Count"
         ) +
-        theme_minimal() +
-        theme(axis.text.x = element_text(angle = 45, hjust = 1))
+        theme_minimal(base_size = 14) +
+        theme(
+          plot.title = element_text(hjust = 0.5, face = "bold", size = 16),
+          plot.subtitle = element_text(hjust = 0.5, size = 12),
+          axis.text.x = element_text(angle = 45, hjust = 1),
+          axis.title.x = element_text(face = "bold"),
+          axis.title.y = element_text(face = "bold"),
+          panel.grid.major.x = element_blank(),
+          panel.grid.minor = element_blank()
+        ) +
+        scale_y_continuous(expand = expansion(mult = c(0, 0.1)))
     } else {
       # Group by Race and the selected variable for stacking
       plot_data <- plot_data %>%
         group_by(RACE, .data[[input$stack_var]]) %>%
         summarize(Count = n(), .groups = "drop")
       
-      ggplot(plot_data, aes(x = RACE, y = Count, fill = .data[[input$stack_var]])) +
-        geom_bar(stat = "identity", position = "stack") +
+      ggplot(plot_data, aes(x = reorder(RACE, -Count), y = Count, fill = .data[[input$stack_var]])) +
+        geom_bar(stat = "identity", position = "stack", color = "black", width = 0.7) +
+        geom_text(
+          aes(label = ifelse(Count > 5, Count, "")),  # Display labels only for significant counts
+          position = position_stack(vjust = 0.5),
+          size = 4,
+          color = "white"
+        ) +
         labs(
           title = paste("Counts of Subjects by Race (Stacked by", input$stack_var, ")"),
+          subtitle = "Interactive stacked bar chart by race",
           x = "Race",
           y = "Count",
           fill = input$stack_var
         ) +
-        theme_minimal() +
-        theme(axis.text.x = element_text(angle = 45, hjust = 1))
+        theme_minimal(base_size = 14) +
+        theme(
+          plot.title = element_text(hjust = 0.5, face = "bold", size = 16),
+          plot.subtitle = element_text(hjust = 0.5, size = 12),
+          axis.text.x = element_text(angle = 45, hjust = 1),
+          axis.title.x = element_text(face = "bold"),
+          axis.title.y = element_text(face = "bold"),
+          panel.grid.major.x = element_blank(),
+          panel.grid.minor = element_blank()
+        ) +
+        scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
+        scale_fill_brewer(palette = "Set2")
     }
-  })
+})
+
 </script>
  
 <script type="application/shiny-prerendered" data-context="server-start">
@@ -696,7 +712,7 @@ adlbc <- read_xpt("data/adlbc.xpt")
 </script>
  
 <script type="application/shiny-prerendered" data-context="server">
-  output$linePlot <- renderPlot({
+ output$linePlot <- renderPlot({
     # Filter data based on selected PARAM
     filtered_data <- adlbc %>% filter(PARAM == input$param)
     
@@ -706,18 +722,40 @@ adlbc <- read_xpt("data/adlbc.xpt")
       summarise(mean_AVAL = mean(AVAL, na.rm = TRUE)) %>%
       arrange(VISIT)
     
-    # Create the line plot
-    ggplot(summarized_data, aes(x = VISIT, y = mean_AVAL)) +
-      geom_line(group = 1, color = "blue") +
-      geom_point(color = "blue") +
-      theme_minimal() +
+    # Determine dynamic y-axis range
+    y_min <- min(summarized_data$mean_AVAL, na.rm = TRUE)
+    y_max <- max(summarized_data$mean_AVAL, na.rm = TRUE)
+    
+    # Add padding to y-axis range for aesthetics
+    y_range <- c(y_min - abs(y_min) * 0.1, y_max + abs(y_max) * 0.1)
+    
+    # Create the enhanced line plot with dynamic y-axis scaling
+    ggplot(summarized_data, aes(x = VISIT, y = mean_AVAL, group = 1)) +
+      geom_line(color = "#0073C2", size = 1.2) +
+      geom_point(color = "#0073C2", size = 3, shape = 21, fill = "white") +
+      geom_text(aes(label = round(mean_AVAL, 2)), 
+                vjust = -0.8, size = 3.5, fontface = "bold") +
+      theme_minimal(base_size = 14) +
       labs(
-        title = paste("Mean AVAL for", input$param),
+        title = paste("Mean AVAL Across Visits for", input$param),
+        subtitle = "Trend of mean AVAL values over time",
         x = "Visit",
         y = "Mean AVAL"
       ) +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+      theme(
+        plot.title = element_text(hjust = 0.5, face = "bold", size = 16),
+        plot.subtitle = element_text(hjust = 0.5, size = 12),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        axis.title.x = element_text(face = "bold"),
+        axis.title.y = element_text(face = "bold"),
+        panel.grid.minor = element_blank()
+      ) +
+      scale_y_continuous(
+        limits = y_range,                              # Set dynamic limits
+        expand = expansion(mult = c(0, 0.1))           # Add space above for labels
+      )
   })
+
 </script>
  
 <script type="application/shiny-prerendered" data-context="server-start">
@@ -811,14 +849,13 @@ ojs_define <- function(..., .session = shiny::getDefaultReactiveDomain()) {
 </script>
 <!--/html_preserve-->
 <!--html_preserve-->
+
 <script type="application/shiny-prerendered" data-context="execution_dependencies">
 {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["packages","version"]},"class":{"type":"character","attributes":{},"value":["data.frame"]},"row.names":{"type":"integer","attributes":{},"value":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67]}},"value":[{"type":"character","attributes":{},"value":["backports","base","bslib","cachem","checkmate","cli","colorspace","compiler","datasets","digest","dplyr","evaluate","fansi","farver","fastmap","forcats","generics","ggplot2","glue","graphics","grDevices","grid","gtable","haven","hms","htmltools","httpuv","jquerylib","jsonlite","knitr","labeling","later","lifecycle","lubridate","magrittr","memoise","methods","mime","munsell","pillar","pkgconfig","promises","R6","random.cdisc.data","RColorBrewer","Rcpp","readr","rlang","rmarkdown","sass","scales","shiny","stats","stringi","stringr","tibble","tidyselect","timechange","tools","tzdb","utf8","utils","vctrs","withr","xfun","xtable","yaml"]},{"type":"character","attributes":{},"value":["1.5.0","4.3.2","0.8.0","1.1.0","2.3.2","3.6.3","2.1-1","4.3.2","4.3.2","0.6.37","1.1.4","1.0.1","1.0.6","2.1.2","1.2.0","1.0.0","0.1.3","3.5.1","1.8.0","4.3.2","4.3.2","4.3.2","0.3.6","2.5.4","1.1.3","0.5.8.1","1.6.15","0.1.4","1.8.9","1.49","0.4.3","1.4.1","1.0.4","1.9.3","2.0.3","2.0.1","4.3.2","0.12","0.5.1","1.9.0","2.0.3","1.3.2","2.5.1","0.3.16","1.1-3","1.0.13-1","2.1.5","1.1.4","2.29","0.4.9","1.3.0","1.9.1","4.3.2","1.8.4","1.5.1","3.2.1","1.2.1","0.3.0","4.3.2","0.4.0","1.2.4","4.3.2","0.6.5","3.0.2","0.49","1.8-4","2.3.10"]}]}]}
 </script>
 <!--/html_preserve-->
-<div class="quarto-auto-generated-content">
 <div class="footer footer-default">
 
-</div>
 </div>
 </section>
     </div>
@@ -847,6 +884,7 @@ ojs_define <- function(..., .session = shiny::getDefaultReactiveDomain()) {
       Reveal.initialize({
 'controlsAuto': true,
 'previewLinksAuto': false,
+'smaller': false,
 'pdfSeparateFragments': false,
 'autoAnimateEasing': "ease",
 'autoAnimateDuration': 1,
@@ -1101,7 +1139,18 @@ ojs_define <- function(..., .session = shiny::getDefaultReactiveDomain()) {
         }
         return false;
       }
-      const onCopySuccess = function(e) {
+      const clipboard = new window.ClipboardJS('.code-copy-button', {
+        text: function(trigger) {
+          const codeEl = trigger.previousElementSibling.cloneNode(true);
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+      });
+      clipboard.on('success', function(e) {
         // button target
         const button = e.trigger;
         // don't keep focus
@@ -1133,50 +1182,11 @@ ojs_define <- function(..., .session = shiny::getDefaultReactiveDomain()) {
         }, 1000);
         // clear code selection
         e.clearSelection();
-      }
-      const getTextToCopy = function(trigger) {
-          const codeEl = trigger.previousElementSibling.cloneNode(true);
-          for (const childEl of codeEl.children) {
-            if (isCodeAnnotation(childEl)) {
-              childEl.remove();
-            }
-          }
-          return codeEl.innerText;
-      }
-      const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
-        text: getTextToCopy
       });
-      clipboard.on('success', onCopySuccess);
-      if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-        // For code content inside modals, clipBoardJS needs to be initialized with a container option
-        // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
-        const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
-          text: getTextToCopy,
-          container: window.document.getElementById('quarto-embedded-source-code-modal')
-        });
-        clipboardModal.on('success', onCopySuccess);
-      }
-        var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-        var mailtoRegex = new RegExp(/^mailto:/);
-          var filterRegex = new RegExp('/' + window.location.host + '/');
-        var isInternal = (href) => {
-            return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
-        }
-        // Inspect non-navigation links and adorn them if external
-     	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
-        for (var i=0; i<links.length; i++) {
-          const link = links[i];
-          if (!isInternal(link.href)) {
-            // undo the damage that might have been done by quarto-nav.js in the case of
-            // links that we want to consider external
-            if (link.dataset.originalHref !== undefined) {
-              link.href = link.dataset.originalHref;
-            }
-          }
-        }
-      function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      function tippyHover(el, contentFn) {
         const config = {
           allowHTML: true,
+          content: contentFn,
           maxWidth: 500,
           delay: 100,
           arrow: false,
@@ -1186,17 +1196,8 @@ ojs_define <- function(..., .session = shiny::getDefaultReactiveDomain()) {
           interactive: true,
           interactiveBorder: 10,
           theme: 'light-border',
-          placement: 'bottom-start',
+          placement: 'bottom-start'
         };
-        if (contentFn) {
-          config.content = contentFn;
-        }
-        if (onTriggerFn) {
-          config.onTrigger = onTriggerFn;
-        }
-        if (onUntriggerFn) {
-          config.onUntrigger = onUntriggerFn;
-        }
           config['offset'] = [0,0];
           config['maxWidth'] = 700;
         window.tippy(el, config); 
@@ -1210,11 +1211,7 @@ ojs_define <- function(..., .session = shiny::getDefaultReactiveDomain()) {
           try { href = new URL(href).hash; } catch {}
           const id = href.replace(/^#\/?/, "");
           const note = window.document.getElementById(id);
-          if (note) {
-            return note.innerHTML;
-          } else {
-            return "";
-          }
+          return note.innerHTML;
         });
       }
       const findCites = (el) => {

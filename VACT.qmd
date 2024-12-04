@@ -211,33 +211,62 @@ output$race_plot <- renderPlot({
         group_by(RACE) %>%
         summarize(Count = n(), .groups = "drop")
       
-      ggplot(plot_data, aes(x = RACE, y = Count)) +
-        geom_bar(stat = "identity", fill = "steelblue") +
+      ggplot(plot_data, aes(x = reorder(RACE, -Count), y = Count)) +
+        geom_bar(stat = "identity", fill = "steelblue", color = "black", width = 0.7) +
+        geom_text(aes(label = Count), vjust = -0.5, size = 4, fontface = "bold") +
         labs(
           title = "Counts of Subjects by Race",
+          subtitle = "Total subject counts grouped by race",
           x = "Race",
           y = "Count"
         ) +
-        theme_minimal() +
-        theme(axis.text.x = element_text(angle = 45, hjust = 1))
+        theme_minimal(base_size = 14) +
+        theme(
+          plot.title = element_text(hjust = 0.5, face = "bold", size = 16),
+          plot.subtitle = element_text(hjust = 0.5, size = 12),
+          axis.text.x = element_text(angle = 45, hjust = 1),
+          axis.title.x = element_text(face = "bold"),
+          axis.title.y = element_text(face = "bold"),
+          panel.grid.major.x = element_blank(),
+          panel.grid.minor = element_blank()
+        ) +
+        scale_y_continuous(expand = expansion(mult = c(0, 0.1)))
     } else {
       # Group by Race and the selected variable for stacking
       plot_data <- plot_data %>%
         group_by(RACE, .data[[input$stack_var]]) %>%
         summarize(Count = n(), .groups = "drop")
       
-      ggplot(plot_data, aes(x = RACE, y = Count, fill = .data[[input$stack_var]])) +
-        geom_bar(stat = "identity", position = "stack") +
+      ggplot(plot_data, aes(x = reorder(RACE, -Count), y = Count, fill = .data[[input$stack_var]])) +
+        geom_bar(stat = "identity", position = "stack", color = "black", width = 0.7) +
+        geom_text(
+          aes(label = ifelse(Count > 5, Count, "")),  # Display labels only for significant counts
+          position = position_stack(vjust = 0.5),
+          size = 4,
+          color = "white"
+        ) +
         labs(
           title = paste("Counts of Subjects by Race (Stacked by", input$stack_var, ")"),
+          subtitle = "Interactive stacked bar chart by race",
           x = "Race",
           y = "Count",
           fill = input$stack_var
         ) +
-        theme_minimal() +
-        theme(axis.text.x = element_text(angle = 45, hjust = 1))
+        theme_minimal(base_size = 14) +
+        theme(
+          plot.title = element_text(hjust = 0.5, face = "bold", size = 16),
+          plot.subtitle = element_text(hjust = 0.5, size = 12),
+          axis.text.x = element_text(angle = 45, hjust = 1),
+          axis.title.x = element_text(face = "bold"),
+          axis.title.y = element_text(face = "bold"),
+          panel.grid.major.x = element_blank(),
+          panel.grid.minor = element_blank()
+        ) +
+        scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
+        scale_fill_brewer(palette = "Set2")
     }
-  })
+})
+
 ```
 
 ## What is happening across Study Visits(Cumulative Exposure)
@@ -270,7 +299,7 @@ plotOutput(outputId = "linePlot")
 
 ```{r}
 #| context: server
-  output$linePlot <- renderPlot({
+ output$linePlot <- renderPlot({
     # Filter data based on selected PARAM
     filtered_data <- adlbc %>% filter(PARAM == input$param)
     
@@ -280,18 +309,40 @@ plotOutput(outputId = "linePlot")
       summarise(mean_AVAL = mean(AVAL, na.rm = TRUE)) %>%
       arrange(VISIT)
     
-    # Create the line plot
-    ggplot(summarized_data, aes(x = VISIT, y = mean_AVAL)) +
-      geom_line(group = 1, color = "blue") +
-      geom_point(color = "blue") +
-      theme_minimal() +
+    # Determine dynamic y-axis range
+    y_min <- min(summarized_data$mean_AVAL, na.rm = TRUE)
+    y_max <- max(summarized_data$mean_AVAL, na.rm = TRUE)
+    
+    # Add padding to y-axis range for aesthetics
+    y_range <- c(y_min - abs(y_min) * 0.1, y_max + abs(y_max) * 0.1)
+    
+    # Create the enhanced line plot with dynamic y-axis scaling
+    ggplot(summarized_data, aes(x = VISIT, y = mean_AVAL, group = 1)) +
+      geom_line(color = "#0073C2", size = 1.2) +
+      geom_point(color = "#0073C2", size = 3, shape = 21, fill = "white") +
+      geom_text(aes(label = round(mean_AVAL, 2)), 
+                vjust = -0.8, size = 3.5, fontface = "bold") +
+      theme_minimal(base_size = 14) +
       labs(
-        title = paste("Mean AVAL for", input$param),
+        title = paste("Mean AVAL Across Visits for", input$param),
+        subtitle = "Trend of mean AVAL values over time",
         x = "Visit",
         y = "Mean AVAL"
       ) +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+      theme(
+        plot.title = element_text(hjust = 0.5, face = "bold", size = 16),
+        plot.subtitle = element_text(hjust = 0.5, size = 12),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        axis.title.x = element_text(face = "bold"),
+        axis.title.y = element_text(face = "bold"),
+        panel.grid.minor = element_blank()
+      ) +
+      scale_y_continuous(
+        limits = y_range,                              # Set dynamic limits
+        expand = expansion(mult = c(0, 0.1))           # Add space above for labels
+      )
   })
+
 ```
 
 ## Relationships of variables (Mixed variable)
