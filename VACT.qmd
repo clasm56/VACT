@@ -54,16 +54,28 @@ top_15 <- adae %>%
 adae_top15 <- adae %>%
   filter(AEDECOD %in% top_15$AEDECOD)
 
-# Plot the top 15 AEDECOD
+# Plot the top 15 AEDECOD with enhancements
 ggplot(adae_top15, aes(x = fct_infreq(AEDECOD))) +
-  geom_bar() +
-  theme_minimal() +
-  labs(title = "Top 15 Adverse Events",
-       x = "Adverse Event",
-       y = "Count") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Tilt x-axis labels for readability
-
-
+  geom_bar(fill = "steelblue", color = "black", width = 0.8) +
+  geom_text(stat = "count", aes(label = ..count..), vjust = -0.5, size = 3.5) +
+  theme_minimal(base_size = 14) +
+  labs(
+    title = "Top 15 Adverse Events",
+    subtitle = "Frequency of Adverse Events in Clinical Trials",
+    x = "Adverse Event",
+    y = "Count"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 16),
+    plot.subtitle = element_text(hjust = 0.5, size = 12),
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 10),
+    axis.text.y = element_text(size = 10),
+    axis.title.x = element_text(face = "bold"),
+    axis.title.y = element_text(face = "bold"),
+    panel.grid.major.x = element_blank(),  # Remove vertical grid lines
+    panel.grid.minor = element_blank()
+  ) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.1)))  # Add space above bars
 ```
 
 ### Barchart(Horizontal)
@@ -72,18 +84,28 @@ ggplot(adae_top15, aes(x = fct_infreq(AEDECOD))) +
 #| echo: false
 library(haven)
 library(ggplot2)
+library(RColorBrewer)
 
 # Read the .xpt file
 adae <- read_xpt("data/adae.xpt")
 
-# Example plot: Distribution of a variable (replace 'AESEV' with a relevant variable in adae)
-ggplot(adae, aes(x = AESEV)) +
-  geom_bar() +
+# Enhanced horizontal bar chart
+ggplot(adae, aes(x = AESEV, fill = AESEV)) +
+  geom_bar(show.legend = FALSE) +
   coord_flip() +
-  theme_minimal() +
-  labs(title = "Adverse Event Severity",
-       x = "Count",
-       y = "Severity")
+  theme_minimal(base_size = 14) + # Increase base font size for readability
+  scale_fill_brewer(palette = "Set2") + # Apply a visually appealing color palette
+  labs(
+    title = "Distribution of Adverse Event Severity",
+    x = "Count", # Adjusted for horizontal bar chart
+    y = "Severity"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"), # Center and style title
+    axis.text = element_text(size = 12), # Increase axis text size
+    axis.title = element_text(size = 14) # Increase axis title size
+  )
+
 ```
 
 ### Grouped Barchart
@@ -93,6 +115,7 @@ library(haven)
 library(ggplot2)
 library(forcats)
 library(dplyr)
+library(RColorBrewer)
 
 # Read the .xpt file
 adae <- read_xpt("data/adae.xpt")
@@ -106,15 +129,26 @@ top_15 <- adae %>%
 adae_top15 <- adae %>%
   filter(AEDECOD %in% top_15$AEDECOD)
 
-# Plot the top 15 AEDECOD grouped by AESEV, side by side
+# Enhanced grouped bar chart
 ggplot(adae_top15, aes(x = fct_infreq(AEDECOD), fill = AESEV)) +
-  geom_bar(position = "dodge") +
-  theme_minimal() +
-  labs(title = "Top 15 Adverse Events Grouped by Severity",
-       x = "Adverse Event",
-       y = "Count",
-       fill = "Severity") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Tilt x-axis labels for readability
+  geom_bar(position = position_dodge(width = 0.8), color = "black", size = 0.3) + # Add borders for better distinction
+  theme_minimal(base_size = 14) + # Set a larger base font size
+  scale_fill_brewer(palette = "Set2") + # Use a visually pleasing color palette
+  labs(
+    title = "Top 15 Adverse Events Grouped by Severity",
+    x = "Adverse Event",
+    y = "Count",
+    fill = "Severity"
+  ) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 12), # Tilt x-axis labels and increase size
+    axis.title = element_text(size = 14), # Larger axis titles
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"), # Center and style title
+    legend.position = "top", # Move legend to the top for better layout
+    legend.title = element_text(size = 12, face = "bold"), # Style legend title
+    legend.text = element_text(size = 10) # Increase legend text size
+  )
+
 ```
 :::
 
