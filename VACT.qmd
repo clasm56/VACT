@@ -353,73 +353,91 @@ plotOutput(outputId = "linePlot")
 #| context: setup 
 # Load necessary libraries
 library(shiny)
+library(shinyWidgets)
 library(random.cdisc.data)
 library(dplyr)
-library(ggplot2)  # Load viridisLite for a better color palette
+library(ggplot2)
 
 # Generate adsl and adae data frames
-
 adsl <- radsl(N = 10, study_duration = 2, seed = 1)
-
 adae <- radae(adsl, seed = 2)
 
-# Check the structure of the datasets to ensure 'TRTEMFL' exists
-# str(adsl)
-# str(adae)
 
 ```
 
 ```{r}
 #| panel: sidebar
-selectInput("dataset", "Choose a dataset:", choices = c("ADSL", "ADAE"))
-selectInput("trtemfl", "Choose a TRTEMFL:", choices = c("Y", "N"))
-checkboxGroupInput("region1", "REGION1:", choices = c("Asia", "Eurasia", "North America", "South America"), selected = "Asia")
-checkboxGroupInput("siteid", "SITEID:", choices = c("BRA-1", "BRA-9", "CHN-11", "CHN-3", "RUS-1", "USA-13"), selected = "BRA-1")
-checkboxGroupInput("demographics", "Demographics:", choices = c("Sex", "Race"), selected = c("Sex", "Race"))
-```
+fluidPage(
+  titlePanel("Clinical Trial Data"),
+  sidebarLayout(
+    sidebarPanel(
+      width = 3, # Adjust sidebar width
+      selectInput("dataset", "Choose a dataset:", choices = c("ADSL", "ADAE")),
+      selectInput("trtemfl", "Choose a TRTEMFL:", choices = c("Y", "N")),
+      lapply(c("region1", "siteid", "sex", "race"), function(var) {
+        pickerInput(
+          inputId = var,
+          label = toupper(var),
+          choices = NULL, # Populate dynamically
+          multiple = TRUE,
+          options = list(`actions-box` = TRUE)
+        )
+      }),
+      checkboxInput("stacked", "Stack by AESER", value = FALSE)
+    ),
+    mainPanel(
+      width = 9, # Increase main panel width
+      plotOutput("barplot"))
 
-```{r}
-#| panel: fill
-plotOutput("barplot")
-#h1("Hello World")
+    )
+  )
+
 ```
 
 ```{r}
 #| context: server
 # Define server logic
-datasetInput <- reactive({
-  switch(input$dataset,
-         "ADSL" = adsl,
-         "ADAE" = adae)
-})
+server <- function(input, output, session) {
+  # Dynamic input population based on dataset
+  observeEvent(input$dataset, {
+    data <- if (input$dataset == "ADSL") adsl else adae
+    updatePickerInput(session, "region1", choices = unique(data$REGION1), selected = unique(data$REGION1)[1])
+    updatePickerInput(session, "siteid", choices = unique(data$SITEID), selected = unique(data$SITEID)[1])
+    updatePickerInput(session, "sex", choices = unique(data$SEX), selected = unique(data$SEX))
+    updatePickerInput(session, "race", choices = unique(data$RACE), selected = unique(data$RACE)[1])
+  }, ignoreNULL = FALSE)
+  
+  output$barplot <- renderPlot({
+    if (input$dataset == "ADSL") {
+      ggplot() +
+        annotate("text", x = 1, y = 1, label = "Select ADAE dataset to view the bar chart", size = 6) +
+        theme_void()
+    } else {
+      # Filter and process data
+      filtered_data <- adae %>%
+        filter(
+          TRTEMFL == input$trtemfl,
+          REGION1 %in% input$region1,
+          SITEID %in% input$siteid,
+          SEX %in% input$sex,
+          RACE %in% input$race
+        )
+      summary_data <- filtered_data %>%
+        group_by(AETERM, variable = if (input$stacked) AESER else ARM) %>%
+        summarise(Frequency = n(), .groups = "drop")
+      
+      # Create bar chart
+      ggplot(summary_data, aes(x = AETERM, y = Frequency, fill = variable)) +
+        geom_bar(stat = "identity", position = if (input$stacked) "stack" else position_dodge()) +
+        labs(
+          title = "Clinical Trial Data",
+          x = "Adverse Event Term (AETERM)",
+          y = "Frequency"
+        ) +
+        theme_minimal(base_size = 10) +
+        theme(axis.text.x = element_text(angle = 45, hjust = 1))
+    }
+  })
+}
 
-output$barplot <- renderPlot({
-  data <- datasetInput()
-  if (input$dataset == "ADAE") {
-# Filter data based on input selections
-    filtered_data <- data %>%
-      filter(TRTEMFL == input$trtemfl,
-             REGION1 %in% input$region1,
-             SITEID %in% input$siteid)
-    # Calculate AETERM frequency by ARM
-    data_summary <- filtered_data %>%
-      group_by(ARM, AETERM) %>%
-      summarise(Frequency = n()) %>%
-      ungroup()
-    # Create bar chart
-    ggplot(data_summary, aes(x = AETERM, y = Frequency, fill = ARM)) +
-
-      geom_bar(stat = "identity", position = position_dodge()) +
-
-      labs(title = "Clinical Trial Data", x = "Adverse Event Term (AETERM)", y = "Frequency") +
-
-      theme_minimal()
-
-  } else {
-    # If ADSL is selected, show a message
-     ggplot() +
-      annotate("text", x = 1, y = 1, label = "Select ADAE dataset to view the bar chart", size = 6) +
-      theme_void()
-  }
-})
 ```
