@@ -1,0 +1,401 @@
+---
+title: "VACT"
+subtitle: "Visual Analytics in Clinical Trials"
+format: 
+  revealjs: 
+    slide-number: true
+#editor: visual
+server: shiny 
+---
+
+## Visual Analytics in Pre-Market Clinical Trials
+
+An interactive review of how visual analytics is used for data exploration in pre-market clinical trials
+
+![Image](images/MITTR-MedidataCover1200.jpeg){.absolute top="5" left="30" width="4000" height="\"200"}
+
+## Course Content
+
+-   Sources of data in Clinical Trials
+
+-   Role of Visual Analytics in Clinical Trials
+
+-   Interactive data exploration examples
+
+
+## Case 1
+-Look through this table and determine which Age group has higher instances of adverse events that affect the vascualar system. Those events higher in the treatment or Placebo arm. 
+
+## Case 2
+- Does this table reflect a subject in this trial is a potential hyslaw case
+
+- answer: the table data doesn't have the time lag data and while it looks like hys law it actually is just delayed bili affect 
+
+
+## Clinical Trial Data
+
+-Data flow/sources of data in clinical trials
+
+## The role of visual analytics
+-   Visual Analytics particularly interactive visuals can streamline the process of exploring and investigating your
+
+- Visual Analytics can help provde insight into your data
+-   AE Categorical
+
+-   Labs Continuous
+
+## AE magnitudes {.smaller .scrollable transition="slide"}
+
+::: panel-tabset
+### About BarCharts 
+- What can barcharts tell us
+
+### BarChart(Vertical)
+
+```{r}
+#| echo: false
+library(haven)
+library(ggplot2)
+library(forcats)
+library(dplyr)
+
+# Read the .xpt file
+adae <- read_xpt("data/adae.xpt")
+
+# Filter the top 15 most frequent AEDECOD
+top_15 <- adae %>%
+  count(AEDECOD, sort = TRUE) %>%
+  slice_max(n, n = 15)
+
+# Filter the original dataset to only include the top 15 AEDECOD
+adae_top15 <- adae %>%
+  filter(AEDECOD %in% top_15$AEDECOD)
+
+# Plot the top 15 AEDECOD
+ggplot(adae_top15, aes(x = fct_infreq(AEDECOD))) +
+  geom_bar() +
+  theme_minimal() +
+  labs(title = "Top 15 Adverse Events",
+       x = "Adverse Event",
+       y = "Count") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Tilt x-axis labels for readability
+
+print("just seeing how this shows up")
+ 
+```
+
+### Barchart(Horizontal)
+
+```{r}
+#| echo: false
+library(haven)
+library(ggplot2)
+
+# Read the .xpt file
+adae <- read_xpt("data/adae.xpt")
+
+# Example plot: Distribution of a variable (replace 'AESEV' with a relevant variable in adae)
+ggplot(adae, aes(x = AESEV)) +
+  geom_bar() +
+  coord_flip() +
+  theme_minimal() +
+  labs(title = "Adverse Event Severity",
+       x = "Count",
+       y = "Severity")
+```
+
+### Grouped Barchart
+
+```{r}
+library(haven)
+library(ggplot2)
+library(forcats)
+library(dplyr)
+
+# Read the .xpt file
+adae <- read_xpt("data/adae.xpt")
+
+# Filter the top 15 most frequent AEDECOD
+top_15 <- adae %>%
+  count(AEDECOD, sort = TRUE) %>%
+  slice_max(n, n = 15)
+
+# Filter the original dataset to only include the top 15 AEDECOD
+adae_top15 <- adae %>%
+  filter(AEDECOD %in% top_15$AEDECOD)
+
+# Plot the top 15 AEDECOD grouped by AESEV, side by side
+ggplot(adae_top15, aes(x = fct_infreq(AEDECOD), fill = AESEV)) +
+  geom_bar(position = "dodge") +
+  theme_minimal() +
+  labs(title = "Top 15 Adverse Events Grouped by Severity",
+       x = "Adverse Event",
+       y = "Count",
+       fill = "Severity") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Tilt x-axis labels for readability
+```
+:::
+
+## Who is in my study (subdivisions)
+
+```{r}
+#| context: setup 
+library(shiny)
+library(dplyr)
+library(haven)
+library(ggplot2)
+
+# Load dataset
+adsl <- read_xpt("data/adsl.xpt")
+```
+
+```{r}
+#| panel: sidebar
+selectInput(
+  "group_var",
+  "Group By:",
+  choices = c("None", "TRT01A", "AGEGR1", "BMIBLGR1"),
+  selected = "None"
+)
+
+```
+
+```{r}
+#| panel: fill
+plotOutput("race_plot")
+```
+
+```{r}
+#| context: server
+ filtered_data <- reactive({
+  # Load the dataset (no filtering by MMSETOT)
+  adsl <- read_xpt("data/adsl.xpt")
+  adsl
+})
+
+output$race_plot <- renderPlot({
+  plot_data <- filtered_data()
+  
+  if (input$group_var == "None") {
+    # Group by Race only for totals
+    plot_data <- plot_data %>%
+      group_by(RACE) %>%
+      summarize(Count = n(), .groups = "drop")
+    
+    ggplot(plot_data, aes(x = RACE, y = Count)) +
+      geom_bar(stat = "identity", fill = "steelblue") +
+      labs(
+        title = "Counts of Subjects by Race",
+        x = "Race",
+        y = "Count"
+      ) +
+      theme_minimal() +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  } else {
+    # Group by Race and the selected variable for stacking
+    plot_data <- plot_data %>%
+      group_by(RACE, .data[[input$group_var]]) %>%
+      summarize(Count = n(), .groups = "drop")
+    
+    ggplot(plot_data, aes(x = RACE, y = Count, fill = .data[[input$group_var]])) +
+      geom_bar(stat = "identity", position = "stack") +
+      labs(
+        title = paste("Counts of Subjects by Race (Stacked by", input$group_var, ")"),
+        x = "Race",
+        y = "Count",
+        fill = input$group_var
+      ) +
+      theme_minimal() +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  }
+})
+```
+
+## What is happening across Study Visits(Cumulative Exposure)
+
+```{r}
+#| context: setup 
+library(shiny)
+library(ggplot2)
+library(dplyr)
+library(haven)
+
+# Read the lab data
+adlbc <- read_xpt("data/adlbc.xpt")
+```
+
+```{r}
+#| panel: sidebar
+  selectInput(
+        inputId = "param",
+        label = "Select Lab Variable (PARAM):",
+        choices = unique(adlbc$PARAM),
+        selected = unique(adlbc$PARAM)[1]
+      )
+```
+
+```{r}
+#| panel: fill
+plotOutput(outputId = "linePlot")
+```
+
+```{r}
+#| context: server
+  output$linePlot <- renderPlot({
+    # Filter data based on selected PARAM
+    filtered_data <- adlbc %>% filter(PARAM == input$param)
+    
+    # Summarize data to calculate mean AVAL for each VISIT
+    summarized_data <- filtered_data %>%
+      group_by(VISIT) %>%
+      summarise(mean_AVAL = mean(AVAL, na.rm = TRUE)) %>%
+      arrange(VISIT)
+    
+    # Create the line plot
+    ggplot(summarized_data, aes(x = VISIT, y = mean_AVAL)) +
+      geom_line(group = 1, color = "blue") +
+      geom_point(color = "blue") +
+      theme_minimal() +
+      labs(
+        title = paste("Mean AVAL for", input$param),
+        x = "Visit",
+        y = "Mean AVAL"
+      ) +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  })
+```
+
+## Relationships between variables (Mixed variable)
+```{r}
+library(dplyr)
+library(haven)
+library(ggplot2)
+library(tidyr)
+adlb <- read_xpt("data/adlbc.xpt")
+adlb_annotated <- adlb %>%
+  filter(PARAMCD %in% c("AST", "ALT", "BILI")) %>% 
+  mutate(
+    # Calculate the ratio AVAL/ULN using A1HI as the reference
+    AVAL_ULN = AVAL / A1HI,
+    
+    # Define CRIT1 descriptions
+    CRIT1 = case_when(
+      PARAMCD == "AST" ~ "AST >=3xULN",
+      PARAMCD == "ALT" ~ "ALT >=3xULN",
+      PARAMCD == "BILI" ~ "BILI >=2xULN"
+    ),
+    
+    # Define flags based on criteria
+    CRIT1FL = if_else(
+      (AVAL_ULN >= 3 & PARAMCD %in% c("AST", "ALT")) |
+        (AVAL_ULN >= 2 & PARAMCD == "BILI"),
+      "Y",
+      NA_character_
+    )
+  ) %>%
+  # Group by USUBJID and PARAMCD
+  group_by(USUBJID, PARAMCD) %>%
+  # For duplicates, select the row with the earliest ADY
+  filter(
+    AVAL_ULN == max(AVAL_ULN, na.rm = TRUE) &
+      ADY == min(ADY[AVAL_ULN == max(AVAL_ULN, na.rm = TRUE)], na.rm = TRUE)
+  ) %>%
+  ungroup() %>%  # Ungroup after filtering
+  select(STUDYID, USUBJID, TRTA, PARAMCD, LBSEQ, ADT, AVISIT, ADY, AVAL, A1HI, AVAL_ULN, CRIT1, CRIT1FL)
+
+# Prepare the data for plotting (use AVAL_ULN instead of AVAL)
+scatter_data <- adlb_annotated %>%
+  filter(PARAMCD %in% c("AST", "ALT", "BILI")) %>%  # Keep AST, ALT, and BILI rows
+  select(USUBJID, TRTA, AVISIT, PARAMCD, AVAL_ULN) %>%  # Retain TRTA and AVISIT
+  pivot_wider(
+    names_from = PARAMCD,  # Use PARAMCD values as column names
+    values_from = AVAL_ULN  # Use AVAL_ULN values as the cell values
+  ) %>%
+  filter(!is.na(ALT) & !is.na(BILI))  # Keep rows where both ALT and BILI are present
+
+
+# Create the scatter plot using ggplot2
+plot <- ggplot(scatter_data, aes(x = ALT, y = BILI)) +
+  geom_point() +  # Add scatter points
+  geom_hline(yintercept = 2, linetype = "dotted", color = "red") +  # Add horizontal reference line at y = 2
+  geom_vline(xintercept = 3, linetype = "dotted", color = "red") +  # Add vertical reference line at x = 3
+  labs(
+    title = "Scatter Plot of ALT vs BILI",
+    x = "Alanine Aminotransferase (U/L) [xULN]",
+    y = "Bilirubin (umol/L) [xULN]"
+  ) +
+  scale_x_continuous(limits = c(0, 6), breaks = seq(0, 6, by = 0.5)) +  # Set x-axis range and tick marks
+  scale_y_continuous(limits = c(0, 5), breaks = seq(0, 5, by = 1)) +  # Set y-axis range and tick marks
+  # Add labels for quadrants
+  annotate("text", x = 4.5, y = 4.5, label = "Potential Hys Law", color = "blue", size = 5, hjust = 0.5) +  # Upper right
+  annotate("text", x = 1.5, y = 4.5, label = "Hyperbilirubinemia", color = "blue", size = 5, hjust = 0.5) +  # Upper left
+  annotate("text", x = 4.5, y = 0.5, label = "Temple's Corollary", color = "blue", size = 5, hjust = 0.5) +  # Lower right
+  theme_minimal()  # Use a clean theme
+# Render the plot
+print(plot)
+```
+
+
+## Case 1 Adverse Event demographic Grouping
+
+```{r}
+#| context: setup 
+# Load necessary libraries
+library(shiny)
+library(haven)
+library(dplyr)
+library(ggplot2)  
+
+adae <- read_xpt("data/adae.xpt")
+
+
+```
+
+```{r}
+#| panel: sidebar
+selectInput("group_var", "Group by:",
+                  choices = c("None", "AGEGR1", "RACE", "AESEV"), 
+                  selected = "None")
+```
+
+```{r}
+#| panel: fill
+plotOutput("barplot", height = "700px")
+```
+
+```{r}
+#| context: server
+  output$barplot <- renderPlot({
+    # Start with the base dataset
+    data <- adae
+    
+    # Dynamically group the data
+    if (input$group_var != "None") {
+      data <- data %>%
+        group_by(AEBODSYS, TRTA, .data[[input$group_var]]) %>%
+        summarise(Count = n(), .groups = "drop")
+    } else {
+      data <- data %>%
+        count(AEBODSYS, TRTA, name = "Count")
+    }
+    
+    # Arrange and factorize AEBODSYS for ordering
+    data <- data %>%
+      arrange(desc(Count)) %>%
+      mutate(AEBODSYS = factor(AEBODSYS, levels = unique(AEBODSYS)))
+    
+    # Create the bar plot
+    ggplot(data, aes(x = AEBODSYS, y = Count, fill = TRTA)) +
+      geom_bar(stat = "identity", position = "dodge") +
+      facet_grid(rows = if (input$group_var != "None") vars(.data[[input$group_var]]) else vars(TRTA), 
+                 scales = "free_y") +
+      theme_minimal() +
+      labs(
+        title = "Adverse Events by Body System and Treatment",
+        x = "Body System (AEBODSYS)",
+        y = "Count of Events",
+        fill = "Treatment"
+      ) +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  })
+```

@@ -1,0 +1,32 @@
+# Example dataset (use adae in your case)
+data <- tibble::tribble(
+  ~AEBODSYS, ~TRTA, ~AESEV, ~AGEGR1, ~Count,
+  "Cardiac", "Drug A", "Mild", "18-30", 10,
+  "Cardiac", "Drug A", "Mild", "31-50", 5,
+  "Cardiac", "Drug B", "Severe", "18-30", 8,
+  "Dermatologic", "Drug A", "Moderate", "18-30", 12,
+  "Dermatologic", "Drug A", "Moderate", "31-50", 9,
+  "Dermatologic", "Drug B", "Severe", "18-30", 7
+)
+
+# Summarize and group data
+summary_table <- data %>%
+  group_by(AEBODSYS, TRTA, AESEV, AGEGR1) %>%
+  summarise(Count = sum(Count), .groups = "drop")
+
+# Create the GT table
+gt_table <- summary_table %>%
+  gt(groupname_col = "AEBODSYS") %>%
+  tab_header(
+    title = "Adverse Events by Body System",
+    subtitle = "Grouped by Treatment, Severity, and Age Group"
+  ) %>%
+  cols_label(
+    TRTA = "Treatment",
+    AESEV = "Severity",
+    AGEGR1 = "Age Group",
+    Count = "Frequency"
+  )
+
+# Print the GT table
+gt_table

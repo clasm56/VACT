@@ -1,0 +1,33 @@
+can you take the slider components out of this shiny app   output$barplot <- renderPlot({
+  # Start with the base dataset
+  data <- adae
+  
+  # Dynamically group the data
+  if (input$group_var != "None") {
+    data <- data %>%
+      group_by(AEBODSYS, TRTA, .data[[input$group_var]]) %>%
+      summarise(Count = n(), .groups = "drop")
+  } else {
+    data <- data %>%
+      count(AEBODSYS, TRTA, name = "Count")
+  }
+  
+  # Arrange and factorize AEBODSYS for ordering
+  data <- data %>%
+    arrange(desc(Count)) %>%
+    mutate(AEBODSYS = factor(AEBODSYS, levels = unique(AEBODSYS)))
+  
+  # Create the bar plot
+  ggplot(data, aes(x = AEBODSYS, y = Count, fill = TRTA)) +
+    geom_bar(stat = "identity", position = "dodge") +
+    facet_grid(rows = if (input$group_var != "None") vars(.data[[input$group_var]]) else vars(TRTA), 
+               scales = "free_y") +
+    theme_minimal() +
+    labs(
+      title = "Adverse Events by Body System and Treatment",
+      x = "Body System (AEBODSYS)",
+      y = "Count of Events",
+      fill = "Treatment"
+    ) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+})
