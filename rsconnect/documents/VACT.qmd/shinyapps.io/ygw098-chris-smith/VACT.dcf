@@ -1,0 +1,14 @@
+name: VACT
+title: VACT
+username: ygw098-chris-smith
+account: ygw098-chris-smith
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 13549454
+bundleId: 9480813
+url: https://ygw098-chris-smith.shinyapps.io/VACT/
+version: 1
+quarto_version: 1.4.555
+quarto_engines: knitr
+asMultiple: FALSE
+asStatic: FALSE
