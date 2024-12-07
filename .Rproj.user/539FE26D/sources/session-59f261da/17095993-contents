@@ -1,0 +1,4 @@
+rsconnect::setAccountInfo(name = 'ygw098-chris-smith',
+                          token = 'D975A407E6EA76E59435F845EA304415',
+                          secret = 'vfgP0VGzW2XhpZUJkXay7MwENwcuJseJLmmFr76I',
+                          server = 'posit.cloud')

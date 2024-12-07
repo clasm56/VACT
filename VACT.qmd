@@ -1,13 +1,6 @@
 ---
 title: "VACT"
-title-slide-attributes:
-  data-background-image: images/MITTR-MedidataCover1200.jpeg
-  data-background-size: contain
-  data-background-opacity: "0.1"
-subtitle: "Visual Analytics in Clinical Trials"
-format: 
-  revealjs: 
-    slide-number: true
+format: html
 #editor: visual
 server: shiny 
 ---
