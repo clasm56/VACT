@@ -1,3 +1,0 @@
-library(haven)
-adlbc <- read_xpt("data/adlbc.xpt")
-
