@@ -2,6 +2,7 @@
   title: "VACT"
 format: html
 #editor: visual
+server: shiny 
 ---
   
   ## Course Content
